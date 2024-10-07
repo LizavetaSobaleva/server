@@ -50,7 +50,7 @@ router.post('/login',
             if (!isPassValid) {
                 return res.status(400).json({message: "Invalid password"})
             }
-            const token = jwt.sign({id: user.id}, process.env.secretKey || config.get('secretKey'), {expiresIn: "1h"})
+            const token = jwt.sign({ id: user.id, status: user.status }, process.env.secretKey || config.get('secretKey'), {expiresIn: "1h"})
             await fileService.buildFolderStructure(`files/${user.id}`)
             return res.json({
                 token,
@@ -60,7 +60,8 @@ router.post('/login',
                     name: user.name,
                     diskSpace: user.diskSpace,
                     usedSpace: user.usedSpace,
-                    avatar: user.avatar
+                    avatar: user.avatar,
+                    status: user.status
                 }
             })
         } catch (e) {
@@ -73,7 +74,7 @@ router.get('/auth', authMiddleware,
     async (req, res) => {
         try {
             const user = await User.findOne({_id: req.user.id})
-            const token = jwt.sign({id: user.id}, process.env.secretKey || config.get('secretKey'), {expiresIn: "1h"})
+            const token = jwt.sign({ id: user.id, status: user.status }, process.env.secretKey || config.get('secretKey'), {expiresIn: "1h"})
             await fileService.buildFolderStructure(`files/${user.id}`)
             return res.json({
                 token,
@@ -83,7 +84,8 @@ router.get('/auth', authMiddleware,
                     name: user.name,
                     diskSpace: user.diskSpace,
                     usedSpace: user.usedSpace,
-                    avatar: user.avatar
+                    avatar: user.avatar,
+                    status: user.status
                 }
             })
         } catch (e) {
